@@ -133,8 +133,29 @@ jobs:
         run: go mod download
       - name: Build application
         run: CGO_ENABLED=0 go build
-      - name: Test application
-        run: go test
+      - name: Test application with coverage
+        run: go test -v -coverprofile=coverage.out -covermode=atomic ./...
+      - name: Generate coverage report
+        run: go tool cover -html=coverage.out -o coverage.html
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-report-go${{ matrix.go-version }}
+          path: |
+            coverage.out
+            coverage.html
+      - name: Check coverage threshold
+        run: |
+          coverage=$(go tool cover -func=coverage.out | grep total | awk '{print $3}' | sed 's/%//')
+          echo "Total coverage: ${coverage}%"
+          threshold=40
+          if (( $(echo "$coverage < $threshold" | bc -l) )); then
+            echo "Coverage ${coverage}% is below threshold ${threshold}%"
+            exit 1
+          fi
+          echo "Coverage ${coverage}% meets threshold ${threshold}%"
+      - name: Run E2E tests
+        run: go test -v -tags=e2e ./e2e/...
       - name: Setup tmate debug session
         uses: mxschmitt/action-tmate@v3
         if: env.RUN_TMATE
