@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"log/slog"
 	"net/http"
 	"os"
 
@@ -10,9 +11,18 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-var apiKey string
+var (
+	apiKey string
+	logger *slog.Logger
+)
 
 func init() {
+	// Initialize structured logger with JSON handler
+	logger = slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
+		Level: slog.LevelInfo,
+	}))
+	slog.SetDefault(logger)
+
 	// Load the API key from the environment
 	apiKey = os.Getenv("API_ACCESS_KEY")
 	notifications.ApiUrl = os.Getenv("API_URL")
