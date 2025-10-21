@@ -123,6 +123,8 @@ repos:
     rev: v5.4.0
     hooks:
       - id: ansible-lint
+        additional_dependencies:
+          - ansible-core
       # files: molecule/default/playbook.yml
 
   # Terraform hooks
