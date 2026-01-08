@@ -1,8 +1,6 @@
 module github.com/cisagov/con-pca-tasks
 
-go 1.24.0
-
-toolchain go1.24.11
+go 1.20
 
 require (
 	github.com/aws/aws-sdk-go-v2 v1.17.6
@@ -11,7 +9,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/sesv2 v1.17.1
 	github.com/aws/aws-sdk-go-v2/service/sts v1.18.6
 	github.com/go-chi/chi/v5 v5.0.8
-	github.com/jackc/pgx/v5 v5.8.0
+	github.com/jackc/pgx/v5 v5.4.3
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 )
 
@@ -25,9 +23,10 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.14.5 // indirect
 	github.com/aws/smithy-go v1.13.5 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
-	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
-	github.com/jackc/puddle/v2 v2.2.2 // indirect
-	golang.org/x/sync v0.17.0 // indirect
-	golang.org/x/text v0.29.0 // indirect
+	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
+	github.com/jackc/puddle/v2 v2.2.1 // indirect
+	golang.org/x/crypto v0.9.0 // indirect
+	golang.org/x/sync v0.1.0 // indirect
+	golang.org/x/text v0.9.0 // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 )
