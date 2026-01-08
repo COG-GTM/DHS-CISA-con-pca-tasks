@@ -1,24 +1,34 @@
 package collections
 
 import (
+	"context"
+
 	db "github.com/cisagov/con-pca-tasks/database"
-	"go.mongodb.org/mongo-driver/bson"
 )
 
 type Phish struct {
-	Name    string `bson:"name"`
-	Subject string `bson:"subject"`
-	Html    string `bson:"html"`
-	Text    string `bson:"text"`
-	Retired bool   `bson:"retired"`
+	Name    string `json:"name"`
+	Subject string `json:"subject"`
+	Html    string `json:"html"`
+	Text    string `json:"text"`
+	Retired bool   `json:"retired"`
 }
 
 // GetPhish returns a phish template by name
 func GetPhish(Name string) (Phish, error) {
 	var p Phish
-	err := db.PhishesCollection.
-		FindOne(db.Ctx, bson.D{{Key: "name", Value: Name}, {Key: "retired", Value: false}}).
-		Decode(&p)
+	err := db.DB.QueryRow(
+		context.Background(),
+		`SELECT name, subject, html, text, retired
+		 FROM templates WHERE name = $1 AND retired = false`,
+		Name,
+	).Scan(
+		&p.Name,
+		&p.Subject,
+		&p.Html,
+		&p.Text,
+		&p.Retired,
+	)
 	if err != nil {
 		return p, err
 	}
