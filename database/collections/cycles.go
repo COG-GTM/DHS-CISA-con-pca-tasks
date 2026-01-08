@@ -1,38 +1,51 @@
 package collections
 
 import (
+	"context"
+	"encoding/json"
 	"time"
 
 	db "github.com/cisagov/con-pca-tasks/database"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type Cycle struct {
-	SubscriptionId string    `bson:"subscription_id"`
-	TemplateIds    []string  `bson:"template_ids"`
-	StartDate      time.Time `bson:"start_date"`
-	EndDate        time.Time `bson:"end_date"`
-	SendByDate     time.Time `bson:"send_by_date"`
-	Active         bool      `bson:"active"`
-	TargetCount    int       `bson:"target_count"`
+	SubscriptionId string    `json:"subscription_id"`
+	TemplateIds    []string  `json:"template_ids"`
+	StartDate      time.Time `json:"start_date"`
+	EndDate        time.Time `json:"end_date"`
+	SendByDate     time.Time `json:"send_by_date"`
+	Active         bool      `json:"active"`
+	TargetCount    int       `json:"target_count"`
 }
 
 // GetCycle returns a cycle by id
 func GetCycle(id string) (Cycle, error) {
 	var c Cycle
+	var templateIdsJSON []byte
 
-	// Convert the string id to an ObjectID
-	objectId, err := primitive.ObjectIDFromHex(id)
+	err := db.DB.QueryRow(
+		context.Background(),
+		`SELECT subscription_id, template_ids, start_date, end_date, send_by_date, active, target_count
+		 FROM cycles WHERE id = $1`,
+		id,
+	).Scan(
+		&c.SubscriptionId,
+		&templateIdsJSON,
+		&c.StartDate,
+		&c.EndDate,
+		&c.SendByDate,
+		&c.Active,
+		&c.TargetCount,
+	)
 	if err != nil {
 		return c, err
 	}
 
-	err = db.CyclesCollection.
-		FindOne(db.Ctx, bson.D{{Key: "_id", Value: objectId}}).
-		Decode(&c)
-	if err != nil {
-		return c, err
+	if templateIdsJSON != nil {
+		if err := json.Unmarshal(templateIdsJSON, &c.TemplateIds); err != nil {
+			return c, err
+		}
 	}
+
 	return c, nil
 }
